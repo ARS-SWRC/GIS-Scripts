@@ -29,7 +29,7 @@ arcpy.CheckOutExtension("Spatial")
 #snapRaster500m = r"H:\MODIS\modis_yearly_1242013\modis_1-1-2000.tif"
 #snapRaster30m = r"Q:\gis\landsat\AZ_Landsat_Seasonal\AZ_2011_fall_tvfc.tif"
 
-PRISM_DIRECTORY ="/Volumes/Drobo/Root/data/PRISM/PRISM_dat_OSU/"
+PRISM_DIRECTORY ="T:/Root/data/PRISM/PRISM_data_OSU/"
 
 def main():
 	# record script run time
@@ -42,10 +42,10 @@ def main():
 	#unzipPRISMData("tmean")
 
 	### CONVERT TO GEOTIFF
-	convertMonthlyPRISMImageryToTIFF("ppt")
-	#convertMonthlyPRISMImageryToTIFF("tmin")
-	#convertMonthlyPRISMImageryToTIFF("tmax")
-	#convertMonthlyPRISMImageryToTIFF("tmean")
+	#convertMonthlyPRISMImageryToTIFF("ppt")
+	convertMonthlyPRISMImageryToTIFF("tmin")
+	convertMonthlyPRISMImageryToTIFF("tmax")
+	convertMonthlyPRISMImageryToTIFF("tmean")
 
 	### CREATE YEARLY AVERAGE DATASETS
 	#averagePRISMImagery_MonthlyToYearly("ppt")
@@ -87,28 +87,34 @@ def unzipPRISMData(prism_variable):
 def convertMonthlyPRISMImageryToTIFF(prism_variable):
 	try:
 		monthlyOutputFolder = PRISM_DIRECTORY + "geotiff/" + prism_variable + "/Monthly"
-		#yearlyOutputFolder = "H:/PRISM/4km/new/" + prism_variable + "/Yearly/"
+		yearlyOutputFolder = PRISM_DIRECTORY + "geotiff/" + prism_variable + "/Yearly"
 		
 		# iterate through each of the year range folders
 		monthlyRangeFolder = PRISM_DIRECTORY + "/bil/" + prism_variable
 		for root, dirs, files in os.walk(monthlyRangeFolder):
 			for file in files:
-				fileExtension = os.path.splitext(file)[1]
+				if not file.startswith('.'):
+					fileExtension = os.path.splitext(file)[1]
+					fileName = os.path.splitext(file)[0]
 
-				year = file.split(".")[0].split("_")[5][0:4]
-				month = str(int(file.split(".")[0].split("_")[5][4:6]))
+					year = fileName.split("_")[4][0:4]
+					month = str(fileName.split("_")[4][4:6])
 
-				#print file
-				if fileExtension == ".bil" and year == "2013" and (month == "11"):
-					currFile = os.path.abspath(os.path.join(root, file))
-					currFileDir = os.path.dirname(currFile)
+					if fileExtension == ".bil":
+						currFile = os.path.abspath(os.path.join(root, file))
+						currFileDir = os.path.dirname(currFile)
 
-					print(file  + "    " + year + "    " + month)
-					# export to GeoTif
-					#env.workspace = currFileDir
-					#arcpy.RasterToOtherFormat_conversion(file, monthlyOutputFolder ,"TIFF")
-
-					print("*** Processing " + file + "  ***")
+						# export to GeoTif
+						env.workspace = currFileDir
+						if month == "":
+							arcpy.RasterToOtherFormat_conversion(file, yearlyOutputFolder ,"TIFF")
+							print("YEARLY: " + file  + "    " + year + "    " + month)
+						else:
+							arcpy.RasterToOtherFormat_conversion(file, monthlyOutputFolder ,"TIFF")
+							print("MONTHLY: " + file  + "    " + year + "    " + month)
+						#print(currFile)
+						
+						print("*** Processing " + file + "  ***")
 				
 		print("All Done!")
 	except:
