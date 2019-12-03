@@ -29,7 +29,14 @@ arcpy.CheckOutExtension("Spatial")
 #snapRaster500m = r"H:\MODIS\modis_yearly_1242013\modis_1-1-2000.tif"
 #snapRaster30m = r"Q:\gis\landsat\AZ_Landsat_Seasonal\AZ_2011_fall_tvfc.tif"
 
-PRISM_DIRECTORY ="T:/Root/data/PRISM/PRISM_data_OSU/"
+###########
+#
+# DO THIS FIRST. Update the path to the Drobo mapped drive.  
+#
+###########
+
+#PRISM_DIRECTORY ="S:/Root/data/PRISM/PRISM_data_OSU/"
+PRISM_DIRECTORY = "S:/PRISM/PRISM_data_OSU/"
 
 def main():
 	# record script run time
@@ -42,10 +49,10 @@ def main():
 	#unzipPRISMData("tmean")
 
 	### CONVERT TO GEOTIFF
-	#convertMonthlyPRISMImageryToTIFF("ppt")
-	convertMonthlyPRISMImageryToTIFF("tmin")
-	convertMonthlyPRISMImageryToTIFF("tmax")
-	convertMonthlyPRISMImageryToTIFF("tmean")
+	convertMonthlyPRISMImageryToTIFF("ppt")
+	#convertMonthlyPRISMImageryToTIFF("tmin")
+	#convertMonthlyPRISMImageryToTIFF("tmax")
+	#convertMonthlyPRISMImageryToTIFF("tmean")
 
 	### CREATE YEARLY AVERAGE DATASETS
 	#averagePRISMImagery_MonthlyToYearly("ppt")
@@ -100,6 +107,8 @@ def convertMonthlyPRISMImageryToTIFF(prism_variable):
 					year = fileName.split("_")[4][0:4]
 					month = str(fileName.split("_")[4][4:6])
 
+					#if(year == "2016"):
+
 					if fileExtension == ".bil":
 						currFile = os.path.abspath(os.path.join(root, file))
 						currFileDir = os.path.dirname(currFile)
@@ -115,7 +124,7 @@ def convertMonthlyPRISMImageryToTIFF(prism_variable):
 						#print(currFile)
 						
 						print("*** Processing " + file + "  ***")
-				
+					
 		print("All Done!")
 	except:
 		print("*** Error ***")
